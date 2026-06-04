@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EmojiMind — Context-Aware Emoji Predictor</title>
+  <meta name="description"
+    content="AI-powered emoji predictor that understands the context of your text using NLP and sentence transformers." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="static/styles.css" />
+</head>
+
+<body>
+  <!-- Animated Background -->
+  <div class="bg-canvas" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Floating emoji particles -->
+  <div class="particles" id="particles" aria-hidden="true"></div>
+
+  <!-- ─── Header ─────────────────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">🧠</span>
+      <span class="logo-text">Emoji<span class="accent">Mind</span></span>
+    </div>
+    <div class="badge-group">
+      <span class="badge badge-nlp">NLP</span>
+      <span class="badge badge-ai">Sentence Transformers</span>
+    </div>
+  </header>
+
+  <!-- ─── Hero ───────────────────────────────────────────────────────── -->
+  <main class="main-content">
+    <section class="hero" id="hero">
+      <h1 class="hero-title">
+        Context-Aware
+        <span class="gradient-text">Emoji Predictor</span>
+      </h1>
+      <p class="hero-sub">
+        Type anything — our NLP model reads semantic meaning and surfaces the
+        emojis that <em>truly</em> match your vibe.
+      </p>
+    </section>
+
+    <!-- ─── Input Card ─────────────────────────────────────────────── -->
+    <section class="input-section" id="input-section">
+      <div class="card input-card">
+        <div class="input-wrapper">
+          <span class="input-icon">✍️</span>
+          <textarea id="text-input" class="text-input" placeholder="Describe your mood, situation, or message…" rows="4"
+            maxlength="500" aria-label="Enter text for emoji prediction" autocomplete="off"
+            spellcheck="true"></textarea>
+          <div class="input-footer">
+            <span class="char-count" id="char-count">0 / 500</span>
+            <button id="predict-btn" class="predict-btn" aria-label="Predict emojis">
+              <span class="btn-text">Predict ✨</span>
+              <span class="btn-spinner" id="btn-spinner" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quick examples -->
+        <div class="examples-row">
+          <span class="examples-label">Try:</span>
+          <button class="example-chip" data-text="I just finished a marathon and feel unstoppable!">🏃 Marathon</button>
+          <button class="example-chip" data-text="Feeling cozy at home with coffee and a good book">☕ Cozy</button>
+          <button class="example-chip" data-text="We won the championship, best day of my life!">🏆 Victory</button>
+          <button class="example-chip" data-text="I miss you so much, my heart hurts">💔 Missing</button>
+          <button class="example-chip" data-text="Just launched my startup, wish me luck">🚀 Startup</button>
+          <button class="example-chip" data-text="This sushi was absolutely divine, 10/10">🍣 Food</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Results ────────────────────────────────────────────────── -->
+    <section class="results-section" id="results-section" aria-live="polite">
+      <!-- Placeholder state -->
+      <div class="results-placeholder" id="results-placeholder">
+        <div class="placeholder-icon">🎯</div>
+        <p>Your predicted emojis will appear here</p>
+      </div>
+
+      <!-- Loading state -->
+      <div class="results-loading hidden" id="results-loading">
+        <div class="loading-pulse">
+          <span>🔮</span><span>🧠</span><span>✨</span>
+        </div>
+        <p class="loading-text">Analysing semantic context…</p>
+      </div>
+
+      <!-- Emoji grid -->
+      <div class="emoji-grid hidden" id="emoji-grid"></div>
+
+      <!-- Copy bar -->
+      <div class="copy-bar hidden" id="copy-bar">
+        <span class="copy-preview" id="copy-preview"></span>
+        <div class="copy-actions">
+          <button class="copy-btn" id="copy-btn" aria-label="Copy all emojis">
+            📋 Copy all
+          </button>
+          <button class="convert-btn" id="convert-btn" aria-label="Convert text with emojis">
+            ✨ Convert Text
+          </button>
+          <button class="compose-open-btn" id="compose-open-btn" aria-label="Open compose box">
+            ✏️ Compose
+          </button>
+          <button class="save-btn" id="save-btn" aria-label="Save emojis to text file">
+            💾 Save to .txt
+          </button>
+        </div>
+        <span class="copy-toast hidden" id="copy-toast">Copied!</span>
+        <span class="save-toast hidden" id="save-toast">Saved!</span>
+      </div>
+
+      <!-- ─── Converted Text Panel ─── -->
+      <div class="converted-panel hidden" id="converted-panel">
+        <div class="converted-header">
+          <span class="converted-label">✨ Converted Text with Emojis</span>
+          <div class="converted-actions">
+            <button class="converted-copy-btn" id="converted-copy-btn" aria-label="Copy converted text">📋 Copy</button>
+            <button class="converted-save-btn" id="converted-save-btn" aria-label="Save converted text">💾 Save .txt</button>
+            <button class="converted-close-btn" id="converted-close-btn" aria-label="Close">✕</button>
+          </div>
+        </div>
+        <div class="converted-output" id="converted-output"></div>
+        <span class="converted-toast hidden" id="converted-toast">Copied!</span>
+      </div>
+    </section>
+
+    <!-- ─── History ────────────────────────────────────────────────── -->
+    <section class="history-section hidden" id="history-section">
+      <h2 class="section-title">Recent searches</h2>
+      <div class="history-list" id="history-list"></div>
+    </section>
+  </main>
+
+  <!-- ─── Footer ────────────────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <p>Powered by <strong>Sentence Transformers</strong> &amp; <strong>all-MiniLM-L6-v2</strong> · Built with Flask
+      &amp; Vanilla JS</p>
+  </footer>
+
+  <!-- ─── Compose Modal ──────────────────────────────────────────────── -->
+  <div class="compose-overlay hidden" id="compose-overlay" role="dialog" aria-modal="true" aria-labelledby="compose-title">
+    <div class="compose-modal">
+      <!-- Header -->
+      <div class="compose-header">
+        <div class="compose-title-group">
+          <span class="compose-icon">✏️</span>
+          <h2 class="compose-title" id="compose-title">Compose Message</h2>
+        </div>
+        <button class="compose-close" id="compose-close" aria-label="Close compose">✕</button>
+      </div>
+
+      <!-- Emoji palette (populated from last prediction) -->
+      <div class="compose-palette-wrap">
+        <p class="compose-palette-label">Click an emoji to insert it at your cursor:</p>
+        <div class="compose-palette" id="compose-palette"></div>
+      </div>
+
+      <!-- Text area -->
+      <div class="compose-body">
+        <textarea
+          id="compose-textarea"
+          class="compose-textarea"
+          placeholder="Write your message here… click an emoji above to insert it ✨"
+          rows="6"
+          spellcheck="true"
+          aria-label="Compose your message with emojis"
+        ></textarea>
+        <div class="compose-char-row">
+          <span class="compose-char-count" id="compose-char-count">0 chars</span>
+          <button class="compose-clear-btn" id="compose-clear-btn">🗑 Clear</button>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="compose-footer">
+        <button class="compose-copy-btn" id="compose-copy-btn">📋 Copy message</button>
+        <button class="compose-save-btn" id="compose-save-btn">💾 Save as .txt</button>
+        <span class="compose-toast hidden" id="compose-toast">Copied!</span>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/app.js"></script>
+</body>
+
+</html>
